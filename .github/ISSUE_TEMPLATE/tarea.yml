@@ -10,7 +10,6 @@ body:
       value: |
         🔖 **Por favor completa los siguientes campos para describir tu Issue.**
 
-
   - type: textarea
 
     id: descripcion
@@ -49,13 +48,4 @@ body:
     validations:
       required: true
 
-  - type: input
-
-    id: labels
-    attributes:
-      label: "Labels"
-      description: "Indica las etiquetas a aplicar, separadas por comas"
-      placeholder: "enhancement, concurrency"
-    validations:
-      required: true
 
