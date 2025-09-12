@@ -2,40 +2,47 @@ package org.example.gestiondeempleados.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.gestiondeempleados.model.Departamento;
-import org.example.gestiondeempleados.service.DepartamentoService;
+import org.example.gestiondeempleados.repository.DepartamentoRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = DepartamentoController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class DepartamentoControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper mapper;
+    @Autowired DepartamentoRepository repo;
 
-    @MockitoBean
-    private DepartamentoService departamentoService;
-
-    @Autowired private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() { repo.deleteAll(); }
 
     @Test
-    void listarDepartamentos_ok() throws Exception {
-        Departamento d = Departamento.builder()
-                .id(1L).nombre("Recursos Humanos").descripcion("RRHH").build();
+    void crear_listar_y_obtener() throws Exception {
+        Departamento d = Departamento.builder().nombre("RRHH").descripcion("Humanos").build();
 
-        when(departamentoService.obtenerTodos()).thenReturn(List.of(d));
+        mockMvc.perform(post("/api/departamentos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(d)))
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/departamentos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nombre").value("Recursos Humanos"));
+                .andExpect(jsonPath("$[0].nombre").value("RRHH"));
+
+        Long id = repo.findAll().get(0).getId();
+        mockMvc.perform(get("/api/departamentos/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("RRHH"));
     }
 }

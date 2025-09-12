@@ -24,7 +24,6 @@ class EmpleadoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // 👇 antes: @MockBean
     @MockitoBean
     private EmpleadoService empleadoService;
 

@@ -2,46 +2,45 @@ package org.example.gestiondeempleados.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.gestiondeempleados.model.Proyecto;
-import org.example.gestiondeempleados.service.ProyectoService;
+import org.example.gestiondeempleados.repository.ProyectoRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = ProyectoController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ProyectoControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper mapper;
+    @Autowired ProyectoRepository repo;
 
-    @MockitoBean
-    private ProyectoService proyectoService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() { repo.deleteAll(); }
 
     @Test
-    void listarProyectosActivos_ok() throws Exception {
+    void crear_y_listar_activos() throws Exception {
         Proyecto p = Proyecto.builder()
-                .id(1L)
-                .nombre("Proyecto Demo")
-                .fechaFin(LocalDate.now().plusDays(5))
-                .build();
+                .nombre("Proyecto X").fechaFin(LocalDate.now().plusDays(3)).build();
 
-        when(proyectoService.proyectosActivos()).thenReturn(List.of(p));
+        mockMvc.perform(post("/api/proyectos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(p)))
+                .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/proyectos/activos").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/proyectos/activos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nombre").value("Proyecto Demo"));
+                .andExpect(jsonPath("$[0].nombre").value("Proyecto X"));
     }
 }
