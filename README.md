@@ -1,3 +1,5 @@
+## Nombre y Apellido: Emilino Coratolo
+
 # 🚀 Trabajo Práctico: Sistema de Gestión de Empleados con JPA y Spring Boot
 
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.0-green)
@@ -1062,3 +1064,105 @@ Cada archivo debe seguir este formato:
 ## 📝 Licencia
 
 Este trabajo es parte del curso de Programación II de Ingeniería en Informática. Uso educativo únicamente.
+
+# Sistema de Gestión de Empleados
+
+Aplicación desarrollada en **Spring Boot** que permite gestionar **empleados, departamentos y proyectos**.  
+Soporta múltiples bases de datos (**H2, MySQL y PostgreSQL**) mediante **Spring Profiles** y puede ejecutarse con **Docker Compose**.  
+
+---
+
+## Documentación de Endpoints
+
+| Método | Endpoint | Descripción | Ejemplo |
+|:------:|:---------|:------------|:--------|
+| **GET** | `/api/empleados` | Lista todos los empleados | `curl -X GET http://localhost:8080/api/empleados` |
+| **GET** | `/api/empleados/{id}` | Obtiene un empleado por su ID | `curl -X GET http://localhost:8080/api/empleados/1` |
+| **POST** | `/api/empleados` | Crea un nuevo empleado | `curl -X POST http://localhost:8080/api/empleados -H "Content-Type: application/json" -d '{"nombre":"Juan","apellido":"Pérez","email":"juan.paez@empresa.com","fechaContratacion":"2024-01-01","salario":50000.00}'` |
+| **PUT** | `/api/empleados/{id}` | Actualiza un empleado existente | `curl -X PUT http://localhost:8080/api/empleados/1 -H "Content-Type: application/json" -d '{"nombre":"Juan","apellido":"Gómez"}'` |
+| **DELETE** | `/api/empleados/{id}` | Elimina un empleado por su ID | `curl -X DELETE http://localhost:8080/api/empleados/1` |
+| **GET** | `/api/empleados/departamento/{nombre}` | Lista empleados de un departamento | `curl -X GET http://localhost:8080/api/empleados/departamento/IT` |
+| **GET** | `/api/empleados/salario?min={min}&max={max}` | Lista empleados por rango de salario | `curl -X GET "http://localhost:8080/api/empleados/salario?min=30000&max=60000"` |
+| **GET** | `/api/departamentos` | Lista todos los departamentos | `curl -X GET http://localhost:8080/api/departamentos` |
+| **GET** | `/api/departamentos/{id}` | Obtiene un departamento por su ID | `curl -X GET http://localhost:8080/api/departamentos/1` |
+| **POST** | `/api/departamentos` | Crea un nuevo departamento | `curl -X POST http://localhost:8080/api/departamentos -H "Content-Type: application/json" -d '{"nombre":"RRHH","descripcion":"Recursos Humanos"}'` |
+| **PUT** | `/api/departamentos/{id}` | Actualiza un departamento | `curl -X PUT http://localhost:8080/api/departamentos/1 -H "Content-Type: application/json" -d '{"descripcion":"Área de personal"}'` |
+| **DELETE** | `/api/departamentos/{id}` | Elimina un departamento | `curl -X DELETE http://localhost:8080/api/departamentos/1` |
+| **GET** | `/api/proyectos` | Lista todos los proyectos | `curl -X GET http://localhost:8080/api/proyectos` |
+| **GET** | `/api/proyectos/activos` | Lista proyectos activos | `curl -X GET http://localhost:8080/api/proyectos/activos` |
+| **POST** | `/api/proyectos` | Crea un nuevo proyecto | `curl -X POST http://localhost:8080/api/proyectos -H "Content-Type: application/json" -d '{"nombre":"Proyecto X","descripcion":"Migración a la nube"}'` |
+| **PUT** | `/api/proyectos/{id}/empleados` | Asigna empleados a un proyecto | `curl -X PUT http://localhost:8080/api/proyectos/1/empleados -H "Content-Type: application/json" -d '[1,2,3]'` |
+
+---
+
+## Instrucciones para Usar el Proyecto
+
+Este sistema puede ejecutarse en **modo desarrollo rápido** con H2 o conectarse a **MySQL/PostgreSQL en Docker**.
+
+---
+
+### Requisitos Previos
+
+- **Java 21+**
+- **Maven 3.9+**
+- **Docker + Docker Compose**
+- **Git**
+
+Opcional:
+- **Postman** o **Insomnia**
+- **curl**
+
+---
+
+### Instalación
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd GestionDeEmpleados
+
+### Instalación de Ejecución y Flujos de Trabajo
+
+1. Asegúrate de que Docker no esté corriendo para evitar conflictos de puertos:
+```bash
+docker compose down
+````
+2. Ejecuta la aplicación con el perfil dev:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+Una vez iniciada, puedes acceder a la API en http://localhost:8080 y a la consola de la base de datos H2 en http://localhost:8080/h2-console (JDBC URL: jdbc:h2:mem:devdb).
+
+Flujo 2: Desarrollo Híbrido (App Local + Base de Datos en Docker)
+El método más recomendado para el desarrollo diario. Te permite ejecutar y depurar la aplicación desde tu IDE mientras te conectas a una base de datos real (MySQL o PostgreSQL) que corre en un contenedor.
+
+Para usar con MySQL:
+
+1. Limpia el entorno anterior (si es necesario):
+```bash
+docker compose down
+````
+2. Inicia SÓLO el contenedor de MySQL:
+```bash
+docker compose up mysql
+````
+Deja esta terminal abierta para ver los logs de la base de datos.
+
+3. Inicia tu aplicación: En una nueva terminal, ejecuta el comando de Maven apuntando al perfil mysql:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql
+````
+
+Para usar con PostgreSQL:
+
+1. Limpia el entorno anterior (si es necesario):
+```bash
+docker compose down
+````
+2. Inicia SÓLO el contenedor de PostgreSQL:
+```bash
+docker compose up postgres
+````
+3. Inicia tu aplicación: En una nueva terminal, ejecuta:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=postgres
+````
